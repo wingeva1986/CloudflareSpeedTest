@@ -9,8 +9,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/XIU2/CloudflareSpeedTest/task"
-	"github.com/XIU2/CloudflareSpeedTest/utils"
+	"github.com/wingeva1986/CloudflareSpeedTest/task"
+	"github.com/wingeva1986/CloudflareSpeedTest/utils"
 )
 
 var (
@@ -22,7 +22,7 @@ func init() {
 	var help = `
 CloudflareSpeedTest ` + version + `
 测试 Cloudflare CDN 所有 IP 的延迟和速度，获取最快 IP (IPv4+IPv6)！
-https://github.com/XIU2/CloudflareSpeedTest
+https://github.com/wingeva1986/CloudflareSpeedTest
 
 参数：
     -n 200
