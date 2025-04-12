@@ -23,6 +23,10 @@ var (
 
 // pingReceived pingTotalTime
 func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
+	// 判断 URL 是否以 /cdn-cgi/trace 结尾
+	if strings.HasSuffix(URL, "/cdn-cgi/trace") {
+		URL = "http://" + ip.String() + "/cdn-cgi/trace"
+	}
 	hc := http.Client{
 		Timeout: time.Second * 2,
 		Transport: &http.Transport{
