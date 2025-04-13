@@ -26,18 +26,18 @@ var (
 func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
 	// 判断 URL 是否以 /cdn-cgi/trace 结尾
 	ckURL := URL
-	var context string
+	var transport *http.Transport
 	if Check {
 		ckURL = "http://" + ip.String() + "/cdn-cgi/trace"
-	} else {
-		context = getDialContext(ip)
+		transport = &http.Transport{ // 没有自定义 DialContext }
+	} else {		
+		transport = &http.Transport{
+			DialContext: getDialContext(ip),
+		}
 	}
 	hc := http.Client{
 		Timeout: time.Second * 2,
-		Transport: &http.Transport{
-			DialContext: context,
-			//TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // 跳过证书验证
-		},
+		Transport: transport,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse // 阻止重定向
 		},
