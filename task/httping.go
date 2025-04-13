@@ -29,7 +29,7 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
 	var transport *http.Transport
 	if Check {
 		ckURL = "http://" + ip.String() + "/cdn-cgi/trace"
-		transport = &http.Transport{ // 没有自定义 DialContext }
+		transport = &http.Transport{  }
 	} else {		
 		transport = &http.Transport{
 			DialContext: getDialContext(ip),
