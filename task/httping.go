@@ -26,14 +26,16 @@ var (
 func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
 	// 判断 URL 是否以 /cdn-cgi/trace 结尾
 	ckURL := URL
-	ckPort :=
+	var context string
 	if Check {
 		ckURL = "http://" + ip.String() + "/cdn-cgi/trace"
+	} else {
+		context = getDialContext(ip)
 	}
 	hc := http.Client{
 		Timeout: time.Second * 2,
 		Transport: &http.Transport{
-			DialContext: getDialContext(ip),
+			DialContext: context,
 			//TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // 跳过证书验证
 		},
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
