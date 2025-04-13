@@ -45,7 +45,7 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
 
 	// 先访问一次获得 HTTP 状态码 及 Cloudflare Colo
 	{
-		requ, err := http.NewRequest(http.MethodHead, URL, nil)
+		requ, err := http.NewRequest(http.MethodHead, ckURL, nil)
 		if err != nil {
 			return 0, 0
 		}
@@ -91,7 +91,7 @@ func (p *Ping) httping(ip *net.IPAddr) (int, time.Duration) {
 	success := 0
 	var delay time.Duration
 	for i := 0; i < PingTimes; i++ {
-		requ, err := http.NewRequest(http.MethodHead, URL, nil)
+		requ, err := http.NewRequest(http.MethodHead, ckURL, nil)
 		if err != nil {
 			log.Fatal("意外的错误，情报告：", err)
 			return 0, 0
