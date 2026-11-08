@@ -149,6 +149,9 @@ https://github.com/XIU2/CloudflareSpeedTest
     -url https://cf.xiu2.xyz/url
         指定测速地址；延迟测速(HTTPing)/下载测速时使用的地址，默认地址不保证可用性，建议自建；
 
+    -check
+        使用 Cloudflare Trace 地址进行 HTTP 延迟测速；自动启用 HTTPing，访问 http://IP:80/cdn-cgi/trace。
+
     -httping
         切换测速模式；延迟测速模式改为 HTTP 协议，所用测试地址为 [-url] 参数；(默认 TCPing)
         注意：HTTPing 本质上也算一种 网络扫描 行为，因此如果你在服务器上面运行，需要降低并发(-n)，否则可能会被一些严格的商家暂停服务。
