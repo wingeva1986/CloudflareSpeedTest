@@ -63,10 +63,14 @@ func (p *Ping) Run() utils.PingDelaySet {
 	if len(p.ips) == 0 {
 		return p.csv
 	}
+	port := TCPPort
+	if Check {
+		port = 80
+	}
 	if Httping {
-		fmt.Printf("开始延迟测速（模式：HTTP, 端口：%d, 范围：%v ~ %v ms, 丢包：%.2f)\n", TCPPort, utils.InputMinDelay.Milliseconds(), utils.InputMaxDelay.Milliseconds(), utils.InputMaxLossRate)
+		utils.Cyan.Printf("开始延迟测速（模式：HTTP, 端口：%d, 范围：%v ~ %v ms, 丢包：%.2f)\n", port, utils.InputMinDelay.Milliseconds(), utils.InputMaxDelay.Milliseconds(), utils.InputMaxLossRate)
 	} else {
-		fmt.Printf("开始延迟测速（模式：TCP, 端口：%d, 范围：%v ~ %v ms, 丢包：%.2f)\n", TCPPort, utils.InputMinDelay.Milliseconds(), utils.InputMaxDelay.Milliseconds(), utils.InputMaxLossRate)
+		utils.Cyan.Printf("开始延迟测速（模式：TCP, 端口：%d, 范围：%v ~ %v ms, 丢包：%.2f)\n", port, utils.InputMinDelay.Milliseconds(), utils.InputMaxDelay.Milliseconds(), utils.InputMaxLossRate)
 	}
 	for _, ip := range p.ips {
 		p.wg.Add(1)
@@ -104,11 +108,12 @@ func (p *Ping) tcping(ip *net.IPAddr) (bool, time.Duration) {
 }
 
 // pingReceived pingTotalTime
-func (p *Ping) checkConnection(ip *net.IPAddr) (recv int, totalDelay time.Duration) {
+func (p *Ping) checkConnection(ip *net.IPAddr) (recv int, totalDelay time.Duration, colo string) {
 	if Httping {
-		recv, totalDelay = p.httping(ip)
+		recv, totalDelay, colo = p.httping(ip)
 		return
 	}
+	colo = "" // TCPing 不获取 colo
 	for i := 0; i < PingTimes; i++ {
 		if ok, delay := p.tcping(ip); ok {
 			recv++
@@ -128,7 +133,7 @@ func (p *Ping) appendIPData(data *utils.PingData) {
 
 // handle tcping
 func (p *Ping) tcpingHandler(ip *net.IPAddr) {
-	recv, totalDlay := p.checkConnection(ip)
+	recv, totalDlay, colo := p.checkConnection(ip)
 	nowAble := len(p.csv)
 	if recv != 0 {
 		nowAble++
@@ -142,6 +147,7 @@ func (p *Ping) tcpingHandler(ip *net.IPAddr) {
 		Sended:   PingTimes,
 		Received: recv,
 		Delay:    totalDlay / time.Duration(recv),
+		Colo:     colo,
 	}
 	p.appendIPData(data)
 }
