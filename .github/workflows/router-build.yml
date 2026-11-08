@@ -1,0 +1,61 @@
+name: Router Linux build
+
+on:
+  push:
+    branches:
+      - "upgrade/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-amd64:
+    name: Ubuntu / Linux amd64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Test
+        run: go test ./...
+
+      - name: Build Linux amd64 binary
+        env:
+          CGO_ENABLED: "0"
+          GOOS: linux
+          GOARCH: amd64
+        run: |
+          mkdir -p dist
+          go build -trimpath -ldflags="-s -w" -o dist/cdnspeedtest-linux-amd64 .
+
+      - name: Prepare router instructions
+        run: |
+          cat > dist/README-router.txt <<'EOF'
+          CloudflareSpeedTest - Linux amd64
+          
+          Architecture: Linux x86_64 / amd64
+          Build: CGO_ENABLED=0 (no external libc dependency expected)
+          
+          Install:
+            chmod +x cdnspeedtest-linux-amd64
+            ./cdnspeedtest-linux-amd64 -h
+          
+          Check feature:
+            ./cdnspeedtest-linux-amd64 -check -ip 1.1.1.1 -t 3 -n 1 -dd -o ""
+          
+          Note: This binary is for amd64/x86_64 only. It will not run on ARM/ARM64 routers.
+          EOF
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdnspeedtest-linux-amd64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
